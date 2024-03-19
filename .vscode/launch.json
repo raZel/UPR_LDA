@@ -1,0 +1,137 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Index Files",
+      "type": "python",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/UN_Countries_Scripts",
+      "program": "${workspaceFolder}/UN_Countries_Scripts/tag-country-pdfs.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": ["index", "output/download-country-pdfs/Countries"]
+    },
+		{
+      "name": "Extra Country Tags",
+      "type": "python",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/UN_Countries_Scripts",
+      "program": "${workspaceFolder}/UN_Countries_Scripts/tag-country-pdfs.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": ["--no-dry-run", "tags", "--calculate-country-extra-tags"]
+    },
+    {
+      "name": "Text Extract",
+      "type": "python",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/UN_Countries_Scripts",
+      "program": "${workspaceFolder}/UN_Countries_Scripts/tag-country-pdfs.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": ["text", "extract"]
+    },
+    {
+      "name": "Update Stop Words",
+      "type": "python",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/UN_Countries_Scripts",
+      "program": "${workspaceFolder}/UN_Countries_Scripts/tag-country-pdfs.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": ["topic", "update_stopwords"]
+    },
+    {
+      "name": "Topic Preprocess",
+      "type": "python",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/UN_Countries_Scripts",
+      "program": "${workspaceFolder}/UN_Countries_Scripts/tag-country-pdfs.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": ["topic", "preprocess"]
+    },
+    {
+      "name": "Text Search Term",
+      "type": "python",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/UN_Countries_Scripts",
+      "program": "${workspaceFolder}/UN_Countries_Scripts/tag-country-pdfs.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": ["text", "search", "human rights defender"]
+    },
+    {
+      "name": "Run LDA",
+      "type": "python",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/UN_Countries_Scripts",
+      "program": "${workspaceFolder}/UN_Countries_Scripts/tag-country-pdfs.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": ["topic", "model",
+			"--filter-by-header", "search(human rights defender)=True",
+			"--num-topics", "15",
+			"--ignore-words", "right,human,state,law,article,https,www,see,org,pdf,com,http,also,last,content_upload,para,aspx,hrd,upr,freedom,sri_lanka,implement,implementation,year,available,dalit",
+      "--passes", "10",
+      "--no-above", "0.9",
+      "--iterations", "50",
+      "--update-every", "1",
+      "--alpha", "auto",
+      // "--eta", "0.01",
+      "--unique-model-name", "Aug15_passes10_topics15_percentile_0.9_iterations_50_alpha_auto_eta_none_final",
+			"--no-update-tags-file"
+		]
+    },
+    {
+      "name": "Optimize LDA",
+      "type": "python",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/UN_Countries_Scripts",
+      "program": "${workspaceFolder}/UN_Countries_Scripts/tag-country-pdfs.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": ["topic", "optimize",
+			"--filter-by-header", "search(human rights defender)=True",
+			"--num-topics", "2:15:1",
+			"--passes", "5:10:1",
+			"--ignore-words", "right,human,state,law,article,https,www,see,org,pdf,com,http,also,last,content_upload,para,aspx,hrd,upr,freedom,sri_lanka",
+			"--results-path", "output/tag-country-pdfs/optimize.csv",
+      "--name-prefix", "optimizelda"
+		]
+    },
+    {
+      "name": "Calc Topics",
+      "type": "python",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/UN_Countries_Scripts",
+      "program": "${workspaceFolder}/UN_Countries_Scripts/tag-country-pdfs.py",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "args": ["topic", "calculate",
+			"--lda-path", "output/tag-country-pdfs/models/trained_lda/Aug15_passes10_topics15_percentile_0.9_iterations_50_alpha_auto_eta_none_final/lda.model",
+			"--results-path", "output/tag-country-pdfs/models/trained_lda/Aug15_passes10_topics15_percentile_0.9_iterations_50_alpha_auto_eta_none_final/democracy_index=Partly Free.csv",
+			"--include-per-document-topics",
+			"--filter-by-header", "search(human rights defender)=True",
+			"--filter-by-header", "democracy_index=Partly Free"
+			]
+    },
+    {
+      "name": "WordClouds",
+      "type": "python",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/UN_Countries_Scripts",
+      "program": "${workspaceFolder}/UN_Countries_Scripts/create-word-cloud.py",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "args": [
+			"--frequency-file", "output/tag-country-pdfs/models/Aug15_passes10_topics15_percentile_0.9_iterations_50_alpha_auto_eta_none_final/topic_14_terms.csv",
+			"--image-file", "output/tag-country-pdfs/models/Aug15_passes10_topics15_percentile_0.9_iterations_50_alpha_auto_eta_none_final/topic_14_terms.png",
+      "--max-words", "20",
+			]
+    }
+  ]
+}
