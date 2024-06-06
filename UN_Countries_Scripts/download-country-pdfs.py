@@ -8,6 +8,7 @@ import time
 import sys
 import glob
 import datetime
+import multiprocessing
 from urllib.parse import urlparse
 script_name = os.path.basename(__file__)[:len(os.path.basename(__file__))-3]
 root_dir = os.path.dirname(os.path.abspath(__file__))
@@ -62,7 +63,10 @@ f.close()
 logging.info(f'finished writing countries links to {searched_countries_local_path}')
 
 # 5. handle_country function accepts the name of the country and the link to the country documentation page
-def handle_country(country, link):
+def handle_country(input):
+    country = input['country']
+    link = input['link']
+    logging.info(f'start handling {country}')
     # 5.0 check if handled already
     country_dir_local_path = f'{output_dir}/Countries/{country}'
     civil_society_local_path = f'{country_dir_local_path}/Civil Society'
@@ -186,10 +190,9 @@ searched_countries_parsed = [{ 'link': f'{documentation_host}{m[0]}', 'country':
 
 
 #6 call the handle country function for each country
-for x in searched_countries_parsed:
-    logging.info(f'start handling {x["country"]}')
-    handle_country(x["country"], x["link"])
-    logging.info(f'finish handling {x["country"]}')
+with multiprocessing.Pool(10) as p:
+		p.map(handle_country, searched_countries_parsed)
+    
 
 
 
