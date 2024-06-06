@@ -9,7 +9,7 @@
       "type": "debugpy",
       "request": "launch",
       "cwd": "${workspaceFolder}/UN_Countries_Scripts",
-      "program": "${workspaceFolder}/UN_Countries_Scripts/tag-country-pdfs.py",
+      "program": "${workspaceFolder}/UN_Countries_Scripts/process-country-pdfs.py",
       "console": "integratedTerminal",
       "justMyCode": true,
       "args": ["index", "output/download-country-pdfs/Countries"]
@@ -19,7 +19,7 @@
       "type": "debugpy",
       "request": "launch",
       "cwd": "${workspaceFolder}/UN_Countries_Scripts",
-      "program": "${workspaceFolder}/UN_Countries_Scripts/tag-country-pdfs.py",
+      "program": "${workspaceFolder}/UN_Countries_Scripts/process-country-pdfs.py",
       "console": "integratedTerminal",
       "justMyCode": true,
       "args": ["--no-dry-run", "tags", "--calculate-country-extra-tags"]
@@ -29,7 +29,7 @@
       "type": "debugpy",
       "request": "launch",
       "cwd": "${workspaceFolder}/UN_Countries_Scripts",
-      "program": "${workspaceFolder}/UN_Countries_Scripts/tag-country-pdfs.py",
+      "program": "${workspaceFolder}/UN_Countries_Scripts/process-country-pdfs.py",
       "console": "integratedTerminal",
       "justMyCode": true,
       "args": ["text", "extract"]
@@ -39,7 +39,7 @@
       "type": "debugpy",
       "request": "launch",
       "cwd": "${workspaceFolder}/UN_Countries_Scripts",
-      "program": "${workspaceFolder}/UN_Countries_Scripts/tag-country-pdfs.py",
+      "program": "${workspaceFolder}/UN_Countries_Scripts/process-country-pdfs.py",
       "console": "integratedTerminal",
       "justMyCode": true,
       "args": ["topic", "update_stopwords"]
@@ -49,7 +49,7 @@
       "type": "debugpy",
       "request": "launch",
       "cwd": "${workspaceFolder}/UN_Countries_Scripts",
-      "program": "${workspaceFolder}/UN_Countries_Scripts/tag-country-pdfs.py",
+      "program": "${workspaceFolder}/UN_Countries_Scripts/process-country-pdfs.py",
       "console": "integratedTerminal",
       "justMyCode": true,
       "args": ["topic", "preprocess"]
@@ -59,7 +59,7 @@
       "type": "debugpy",
       "request": "launch",
       "cwd": "${workspaceFolder}/UN_Countries_Scripts",
-      "program": "${workspaceFolder}/UN_Countries_Scripts/tag-country-pdfs.py",
+      "program": "${workspaceFolder}/UN_Countries_Scripts/process-country-pdfs.py",
       "console": "integratedTerminal",
       "justMyCode": true,
       "args": ["text", "search", "human rights defender"]
@@ -69,7 +69,7 @@
       "type": "debugpy",
       "request": "launch",
       "cwd": "${workspaceFolder}/UN_Countries_Scripts",
-      "program": "${workspaceFolder}/UN_Countries_Scripts/tag-country-pdfs.py",
+      "program": "${workspaceFolder}/UN_Countries_Scripts/process-country-pdfs.py",
       "console": "integratedTerminal",
       "justMyCode": true,
       "args": ["topic", "model",
@@ -91,7 +91,7 @@
       "type": "debugpy",
       "request": "launch",
       "cwd": "${workspaceFolder}/UN_Countries_Scripts",
-      "program": "${workspaceFolder}/UN_Countries_Scripts/tag-country-pdfs.py",
+      "program": "${workspaceFolder}/UN_Countries_Scripts/process-country-pdfs.py",
       "console": "integratedTerminal",
       "justMyCode": true,
       "args": ["topic", "optimize",
@@ -99,7 +99,7 @@
 			"--num-topics", "2:15:1",
 			"--passes", "5:10:1",
 			"--ignore-words", "right,human,state,law,article,https,www,see,org,pdf,com,http,also,last,content_upload,para,aspx,hrd,upr,freedom,sri_lanka",
-			"--results-path", "output/tag-country-pdfs/optimize.csv",
+			"--results-path", "output/process-country-pdfs/optimize.csv",
       "--name-prefix", "optimizelda"
 		]
     },
@@ -108,12 +108,12 @@
       "type": "debugpy",
       "request": "launch",
       "cwd": "${workspaceFolder}/UN_Countries_Scripts",
-      "program": "${workspaceFolder}/UN_Countries_Scripts/tag-country-pdfs.py",
+      "program": "${workspaceFolder}/UN_Countries_Scripts/process-country-pdfs.py",
       "console": "integratedTerminal",
       "justMyCode": false,
       "args": ["topic", "calculate",
-			"--lda-path", "output/tag-country-pdfs/models/trained_lda/Aug15_passes10_topics15_percentile_0.9_iterations_50_alpha_auto_eta_none_final/lda.model",
-			"--results-path", "output/tag-country-pdfs/models/trained_lda/Aug15_passes10_topics15_percentile_0.9_iterations_50_alpha_auto_eta_none_final/democracy_index=Partly Free.csv",
+			"--lda-path", "output/process-country-pdfs/models/trained_lda/Aug15_passes10_topics15_percentile_0.9_iterations_50_alpha_auto_eta_none_final/lda.model",
+			"--results-path", "output/process-country-pdfs/models/trained_lda/Aug15_passes10_topics15_percentile_0.9_iterations_50_alpha_auto_eta_none_final/democracy_index=Partly Free.csv",
 			"--include-per-document-topics",
 			"--filter-by-header", "search(human rights defender)=True",
 			"--filter-by-header", "democracy_index=Partly Free"
@@ -128,8 +128,8 @@
       "console": "integratedTerminal",
       "justMyCode": false,
       "args": [
-			"--frequency-file", "output/tag-country-pdfs/models/Aug15_passes10_topics15_percentile_0.9_iterations_50_alpha_auto_eta_none_final/topic_14_terms.csv",
-			"--image-file", "output/tag-country-pdfs/models/Aug15_passes10_topics15_percentile_0.9_iterations_50_alpha_auto_eta_none_final/topic_14_terms.png",
+			"--frequency-file", "output/process-country-pdfs/models/Aug15_passes10_topics15_percentile_0.9_iterations_50_alpha_auto_eta_none_final/topic_14_terms.csv",
+			"--image-file", "output/process-country-pdfs/models/Aug15_passes10_topics15_percentile_0.9_iterations_50_alpha_auto_eta_none_final/topic_14_terms.png",
       "--max-words", "20",
 			]
     }

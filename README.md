@@ -2,27 +2,34 @@
 
 Data acquisition and LDA topic modeling of civil society submissions to the UPR
 
+This project has 2 main scripts written in Python.
+
+* `download-country-pdfs.py` crawls the [UPR documentations](https://www.ohchr.org/en/hr-bodies/upr/documentation) website, filters and downloads all english submissions of the third cycle Civil Society submissions.
+* `process-country-pdfs.py` is the main tool for analyzing the data recovered including text conversion, model training, tag extraction per document and so on.
+
 ## installation
 
-- install conda at least 3.5
-- create new conda env
+* install conda minimum version 23.5.0  
+[miniconda](https://docs.anaconda.com/free/miniconda/miniconda-install/)
+* create a new conda env from env file  
   `conda env create -f environment.yml`  
 
 ## development
 
-- save conda env using `conda env export --no-build | grep -v "^prefix: " > environment.yml`
+save conda env using  
+`conda env export --no-build | grep -v "^prefix: " > environment.yml`
 
 ## use in vscode
 
-- select python phd
+* select python phd
   `Command + Shift + P -> Python: Select Interpreter -> choose conda phd`
-- to configure open .vscode/launch.json
-- to run press the triangle and bug button
+* to configure open .vscode/launch.json
+* to run press the triangle and bug button
 
 ### Index Files
 
 create the initial csv indexing all the files by country - overwrites  
-find csv file in output/tag-country-pdfs/tags.csv
+find csv file in output/prcoess-country-pdfs/tags.csv
 
 ### Text Extract
 
@@ -48,9 +55,9 @@ use script download-country-pdfs.py
 
 ### tagging
 
-use script tag-country-pdfs.py with the needed command  
-`python tag-country-pdfs.py`  
+use script process-country-pdfs.py with the needed command  
+`python process-country-pdfs.py`  
 
 for help run  
-`python tag-country-pdfs.py -h`  
+`python process-country-pdfs.py -h`  
 *when using index command tags-file might be overwritten*

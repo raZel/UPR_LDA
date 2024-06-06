@@ -6,7 +6,6 @@ import shutil
 import json
 import time
 import sys
-import PyPDF2
 import glob
 import datetime
 from urllib.parse import urlparse
@@ -172,21 +171,7 @@ def handle_country(country, link):
         if os.path.getsize(file_download_local_path) == 0:
             logging.warn(f'found zero size file {file_download_local_path}. skipping text conversion')
             continue
-        #5.15 extract text from pdf
-        pdf = open(file_download_local_path, 'rb')
-        reader = PyPDF2.PdfReader(pdf)
-        text = []
-        for page in reader.pages:
-            text.append(page.extract_text())
-        pdf.close()
 
-        # 5.16 save the text file
-        text_file_local_path = f'{file_download_local_path}.txt'
-        logging.info(f'saving text file to {text_file_local_path}')
-        f = open(text_file_local_path, "w+")
-        f.write("\n\n".join(text))
-        f.close()
-        logging.info(f'saved file to {text_file_local_path}')
     downloaded_pdf_files = glob.glob(f'{civil_society_local_path}/*.pdf')
     logging.info(f'finished downloading files {country},{len(downloaded_pdf_files)}')
     f = open(done_file_path, "w+")

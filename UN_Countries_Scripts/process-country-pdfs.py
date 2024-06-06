@@ -153,7 +153,7 @@ def search_text(term: str, dry_run: bool):
 	if not dry_run:
 		write_tags_csv(rows)
 	
-	log.info(f'finished seaching term')
+	log.info(f'finished searching term')
 	log.info(f'{searched_files_count} files searched for {term}')
 	log.info(f'{found_term_files_count} files contained term: {term}')
 	log.info(f'{not_found_term_files_count} files did not contain term: {term}')
