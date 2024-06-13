@@ -11,8 +11,14 @@ This project has 2 main scripts written in Python.
 
 * install conda minimum version 23.5.0  
 [miniconda](https://docs.anaconda.com/free/miniconda/miniconda-install/)
-* create a new conda env from env file  
+* create a new conda env from env fileby running the follwoing command from the repo root dir  
   `conda env create -f environment.yml`  
+  this will create a new `upr_lda` conda environment and install the required dependencies  
+
+## usage
+
+* call `python download-country-pdfs.py` to run the script to download the pdf countries.  
+  results are saved to `UN_Countries_Scripts/output/download-country-pdfs` dir
 
 ## development
 
@@ -43,9 +49,9 @@ change the term to whatever you need and run Search Term
 
 ## use in Terminal
 
-- activate phd env
+* activate phd env
   `conda activate phd`
-- cd to UN_Countries_dir
+* cd to UN_Countries_dir
   `cd UN_Countries_dir`
 
 ## download

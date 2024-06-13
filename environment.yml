@@ -1,4 +1,4 @@
-name: phd
+name: upr_lda
 channels:
   - anaconda
   - conda-forge
