@@ -14,7 +14,7 @@ script_name = os.path.basename(__file__)[:len(os.path.basename(__file__))-3]
 root_dir = os.path.dirname(os.path.abspath(__file__))
 output_dir = f'{root_dir}/output/{script_name}'
 
-log = logging.getLogger()
+log = multiprocessing.get_logger()
 log.setLevel(logging.DEBUG)
 stdout_handler = logging.StreamHandler(sys.stdout)
 stdout_handler.setLevel(logging.DEBUG)
