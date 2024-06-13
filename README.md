@@ -17,8 +17,15 @@ This project has 2 main scripts written in Python.
 
 ## usage
 
+before using any of the scripts, conda env must be activated by calling
+  `conda activate upr_lda`
+
+### downloading the relevant pdf files to serve as data
+
 * call `python download-country-pdfs.py` to run the script to download the pdf countries.  
   results are saved to `UN_Countries_Scripts/output/download-country-pdfs` dir
+
+### analyzing the data by processing it with defferent commands
 
 ## development
 
