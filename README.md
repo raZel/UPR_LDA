@@ -2,55 +2,32 @@
 
 Data acquisition and LDA topic modeling of civil society submissions to the UPR
 
-## installation
+## General
 
-- install conda at least 3.5
-- create new conda env
-  `conda env create -f environment.yml`  
+This project contains code to downloads relevant pdf documetns from the UPR to be used as input to train an LDA Topic Model and gain important insights.
 
-## development
+The general process is as follows:
 
-- save conda env using `conda env export --no-build | grep -v "^prefix: " > environment.yml`
+- search for and download all english PDF reports of the UPR third cycle under civil society.
+- transform pdf to textual data using google tesseract OCR.
+- tag documents by different apsects such as OECD status, democracy status and so on.
+- filter documents by search terms and other tags.
+- run preprocessing including, lemmatization, bigrams, stop words and more.
+- run LDA topic model training on a corpus created by the filtered and preprocessed set of documents using gensim
+- present a visual representation of the trained model using LDAVIS
 
-## use in vscode
+## Install
 
-- select python phd
-  `Command + Shift + P -> Python: Select Interpreter -> choose conda phd`
-- to configure open .vscode/launch.json
-- to run press the triangle and bug button
+This project uses conda to manage dependencies required by the code.
+Find Installation instructions [here](https://www.anaconda.com/docs/getting-started/miniconda/install)
 
-### Index Files
+With conda properly installed cd to the upr_lda directory and run create the conda environment to run the upr_lda code.
+`conda env create`
 
-create the initial csv indexing all the files by country - overwrites  
-find csv file in output/tag-country-pdfs/tags.csv
+## Develop (macos)
 
-### Text Extract
-
-reads the pdfs and extracts text to txt file
-
-### Text Search Term
-
-search a term in the files and add tag to csv  
-open launch.json - `"args": ["text", "search", "Human Rights Defenders"]`
-change the term to whatever you need and run Search Term
-
-## use in Terminal
-
-- activate phd env
-  `conda activate phd`
-- cd to UN_Countries_dir
-  `cd UN_Countries_dir`
-
-## download
-
-use script download-country-pdfs.py
-  `python download-country-pdfs.py`
-
-### tagging
-
-use script tag-country-pdfs.py with the needed command  
-`python tag-country-pdfs.py`  
-
-for help run  
-`python tag-country-pdfs.py -h`  
-*when using index command tags-file might be overwritten*
+- `brew install miniconda --cask`
+- `conda init zsh`
+- `conda create -n upr_lda python=3.13`
+- `conda activate upr_lda`
+- `conda env export > environment.yml` (run everytime conda or pip packages are updated in an activated env)
