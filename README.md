@@ -28,6 +28,6 @@ With conda properly installed cd to the upr_lda directory and run create the con
 
 - `brew install miniconda --cask`
 - `conda init zsh`
-- `conda create -n upr_lda python=3.13`
+- `conda create -n upr_lda python=3.12`
 - `conda activate upr_lda`
 - `conda env export > environment.yml` (run everytime conda or pip packages are updated in an activated env)
