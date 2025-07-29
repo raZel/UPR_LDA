@@ -8,31 +8,61 @@ import typing
 import abc
 import logging
 from UPR_LDA.models import Document
-from .document_downloader import DocumentDownloader
-from .document_transformer import DocumentTransformer
-from .document_cache import DocumentCache
+from .pdf_utils import PdfUtils
+from .document_cache import DocumentCache, NOOPDocumentCache, FSDocumentCache
+import hashlib
+import aiohttp
 
-logger = logging.getLogger(__name__)
-
+_logger = logging.getLogger(__name__)
 class DocumentFetcher(abc.ABC):
-    def __init__(self):
-        self.downloader = DocumentDownloader()
-        self.transformer = DocumentTransformer()
+    def __init__(self) -> None:
+       self.session = aiohttp.ClientSession()
 
-    async def fetch(self, url: str) -> Document:
-        # logger.info("fetching document. document_key: %s, url: %s", document_key, url)
-        # # check if in cache
-        # if self.cache:
-        #     try:
-        #         logger.info("fetching from cache. document_key: %s, url: %s", document_key, url)
-        #         return await self.cache.load(document_key)
-        #     except Exception:
-        #         logger.exception("failed fetching from cache. document_key: %s, url: %s", document_key, url)
+    async def download(self, url) -> bytes:
+            async with self.session.get(url) as response:
+                response.raise_for_status()
+                return await response.read()
+
+    @abc.abstractmethod
+    async def fetch(self, url: str, key: typing.Optional[str] = None) -> Document:
+        pass
+
+class PDFFetcher(DocumentFetcher):
+    def __init__(self, cache: DocumentCache = NOOPDocumentCache()):
+        super().__init__()
+        self.cache = cache
+
+    async def fetch(self, url: typing.Optional[str] = None, key: typing.Optional[str] = None) -> Document:
+        """
+            fetch document from url.
+            optionally use key as identifier for the document mainly for caching
+            if no key provided hash the url to get a key
+            important, duplicates are only checked with the key, not the content.
+            fetching the same url with different keys will save duplicates.
+        """
+        _logger.debug("fetch called with args: %s", locals())
+        if key:
+            document_key = key
+        elif url:
+            document_key = hashlib.md5(url.encode()).hexdigest()
+        else:
+            raise ValueError("Either url or key must be provided")
         
-        logger.info("fetching document. url: %s", url)
-        doc_bytes = await self.downloader.download(url)
-        doc_str = await self.transformer.pdf_to_text(doc_bytes)
-        return Document(url=url, content=doc_str)
+        _logger.debug("checking cache. document_key: %s", document_key)
+        doc = await self.cache.load(document_key)
+        if doc:
+            return doc
+        _logger.debug("document not in cache. document_key: %s", document_key)
+
+        if not url:
+            raise ValueError("no url to fetch")
+        _logger.info("fetching document. url: %s", url)
+        doc_bytes = await self.download(url)
+        doc_str = await PdfUtils.pdf_to_text(doc_bytes)
+        doc = Document(url=url, content=doc_str, key=document_key)
+        saved = await self.cache.save(doc)
+        _logger.warning("failed saving to cache. doc: %s", doc)
+        return doc
 
 
 
