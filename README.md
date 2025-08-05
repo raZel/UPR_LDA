@@ -19,7 +19,7 @@ The general process is as follows:
 ## Install
 
 This project uses conda to manage dependencies required by the code.
-Find Installation instructions [here](https://www.anaconda.com/docs/getting-started/miniconda/install)
+[Installation instructions](https://www.anaconda.com/docs/getting-started/miniconda/install)
 
 With conda properly installed cd to the upr_lda directory and run create the conda environment to run the upr_lda code.
 `conda env create`
