@@ -30,5 +30,6 @@ With conda properly installed cd to the upr_lda directory and run create the con
 - `conda init zsh`
 - `conda create -n upr_lda python=3.12`
 - `conda activate upr_lda`
-- `conda env export > environment.yml` (run everytime conda or pip packages are updated in an activated env)
+- `pip install package` in activated env to install python packages
+- `conda env export --no-build | grep -v "^prefix: " > environment.yml` (run everytime conda or pip packages are updated in an activated env)
 - run tests with `pytest -vvv` from project root
