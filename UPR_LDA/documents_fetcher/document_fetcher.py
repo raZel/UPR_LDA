@@ -7,7 +7,7 @@ a pdf version of it from a url and transforming it to a txt file.
 import typing
 import abc
 import logging
-from UPR_LDA.models import Document
+from UPR_LDA.models import DocumentData
 from .pdf_utils import PdfUtils
 from .document_cache import DocumentCache, NOOPDocumentCache, FSDocumentCache
 import hashlib
@@ -19,12 +19,16 @@ class DocumentFetcher(abc.ABC):
        self.session = aiohttp.ClientSession()
 
     async def download(self, url) -> bytes:
-            async with self.session.get(url) as response:
+        async with self.session.get(url) as response:
+            try:
                 response.raise_for_status()
                 return await response.read()
+            except aiohttp.ClientResponseError:
+                _logger.error(f"Request to {url} failed with status {response.status}. Response: {await response.text()}")
+                raise
 
     @abc.abstractmethod
-    async def fetch(self, url: str, key: typing.Optional[str] = None) -> Document:
+    async def fetch(self, url: str, key: typing.Optional[str] = None) -> DocumentData:
         pass
 
 class PDFFetcher(DocumentFetcher):
@@ -32,7 +36,7 @@ class PDFFetcher(DocumentFetcher):
         super().__init__()
         self.cache = cache
 
-    async def fetch(self, url: typing.Optional[str] = None, key: typing.Optional[str] = None) -> Document:
+    async def fetch(self, url: typing.Optional[str] = None, key: typing.Optional[str] = None) -> DocumentData:
         """
             fetch document from url.
             optionally use key as identifier for the document mainly for caching
@@ -59,7 +63,7 @@ class PDFFetcher(DocumentFetcher):
         _logger.info("fetching document. url: %s", url)
         doc_bytes = await self.download(url)
         doc_str = await PdfUtils.pdf_to_text(doc_bytes)
-        doc = Document(url=url, content=doc_str, key=document_key)
+        doc = DocumentData(url=url, content=doc_str, key=document_key)
         saved = await self.cache.save(doc)
         _logger.warning("failed saving to cache. doc: %s", doc)
         return doc
@@ -67,4 +71,3 @@ class PDFFetcher(DocumentFetcher):
 
 
     
-

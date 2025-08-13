@@ -1,1 +1,1 @@
-from .models import Document, ModelKey, DocumentMetaData, UPRDocumentMetaData
+from .models import *
