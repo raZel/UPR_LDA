@@ -66,6 +66,9 @@ dependencies:
       - annotated-types==0.7.0
       - attrs==25.3.0
       - beautifulsoup4==4.13.4
+      - certifi==2025.8.3
+      - charset-normalizer==3.4.3
+      - cloudscraper==1.2.71
       - frozenlist==1.6.2
       - idna==3.10
       - iniconfig==2.1.0
@@ -79,10 +82,14 @@ dependencies:
       - pydantic==2.11.5
       - pydantic-core==2.33.2
       - pygments==2.19.1
+      - pyparsing==3.2.3
       - pytesseract==0.3.13
       - pytest==8.4.0
       - pytest-asyncio==1.0.0
+      - requests==2.32.4
+      - requests-toolbelt==1.0.0
       - soupsieve==2.7
       - typing-extensions==4.14.0
       - typing-inspection==0.4.1
+      - urllib3==2.5.0
       - yarl==1.20.0

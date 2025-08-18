@@ -11,4 +11,5 @@ logger = logging.Logger(__name__)
 class TestHtmlCrawl:
     @pytest.mark.asyncio
     async def test_crawl_upr(self) -> None:
-        results = await crawl_upr_for_civil_society_submissions("https://www.ohchr.org/en/hr-bodies/upr/documentation") 
+        results = await crawl_upr_for_civil_society_submissions("https://www.ohchr.org/en/hr-bodies/upr/documentation")
+        assert len(results) != 0
