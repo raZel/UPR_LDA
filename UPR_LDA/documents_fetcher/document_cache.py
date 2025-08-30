@@ -34,6 +34,9 @@ class InMemoryDocumentCache(DocumentCache):
     async def load(self, document_key: str) -> typing.Optional[models.DocumentData]:
         return self._cache.get(document_key)
 
+# TODO: make this save raw bytes instead of just text. this invloves changing the what is saved in the DocuemntCache object
+# the way it is saved and read from File System and the was we calculate the key, 
+# perhaps the key should be mandatory or a uuid or hash based + something?
 class FSDocumentCache(DocumentCache):
     """
     saves and loads documents in json format to the file system in the following location
