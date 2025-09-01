@@ -9,11 +9,21 @@ class UPRCycle(str, Enum):
     FOURTH = "Fourth"
 
 ModelKey = str
+class FileType(str, Enum):
+    PDF = "pdf"
+    TEXT = "txt"
 
-class DocumentData(BaseModel):
+class FileMetadata(BaseModel):
     key: ModelKey
-    url: str
-    content: str
+    type: FileType
+
+class FileData(BaseModel):
+    content: bytes
+    metadata: FileMetadata
+
+    @property
+    def key(self) -> ModelKey:
+        return self.metadata.key
 
 class DocumentMetaData(BaseModel):
     key: typing.Optional[ModelKey] = None
@@ -24,8 +34,9 @@ class UPRCivilSocietyTags(BaseModel):
     cycle: typing.Optional[str] = None
     organization_name: typing.Optional[str] = None
 
-    #TODO: add more tags that will be parsed from the html
-
 class UPRDocumentMetaData(DocumentMetaData, UPRCivilSocietyTags):
     continent: typing.Optional[str] = None
+    pdf_file: typing.Optional[FileData] = None
+    text_file: typing.Optional[FileData] = None
+
 

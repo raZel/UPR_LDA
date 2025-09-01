@@ -7,9 +7,8 @@ a pdf version of it from a url and transforming it to a txt file.
 import typing
 import abc
 import logging
-from UPR_LDA.models import DocumentData
-from .pdf_utils import PdfUtils
-from .document_cache import DocumentCache, NOOPDocumentCache, FSDocumentCache
+from UPR_LDA.models import FileData, FileMetadata, FileType
+from .document_cache import DocumentCache, NOOPDocumentCache
 import hashlib
 import aiohttp
 
@@ -28,7 +27,7 @@ class DocumentFetcher(abc.ABC):
                 raise
 
     @abc.abstractmethod
-    async def fetch(self, url: str, key: typing.Optional[str] = None) -> DocumentData:
+    async def fetch(self, url: str, key: typing.Optional[str] = None) -> FileData:
         pass
 
 class PDFFetcher(DocumentFetcher):
@@ -36,7 +35,7 @@ class PDFFetcher(DocumentFetcher):
         super().__init__()
         self.cache = cache
 
-    async def fetch(self, url: typing.Optional[str] = None, key: typing.Optional[str] = None) -> DocumentData:
+    async def fetch(self, url: typing.Optional[str] = None, key: typing.Optional[str] = None, check_cache_only: bool = False) -> FileData:
         """
             fetch document from url.
             optionally use key as identifier for the document mainly for caching
@@ -48,7 +47,7 @@ class PDFFetcher(DocumentFetcher):
         if key:
             document_key = key
         elif url:
-            document_key = hashlib.md5(url.encode()).hexdigest()
+            document_key = hashlib.md5(url.encode()).hexdigest() + ".pdf"
         else:
             raise ValueError("Either url or key must be provided")
         
@@ -57,15 +56,20 @@ class PDFFetcher(DocumentFetcher):
         if doc:
             return doc
         _logger.debug("document not in cache. document_key: %s", document_key)
+        if check_cache_only:
+            raise ValueError("not in cache and check_cache_only: %s", check_cache_only)
 
         if not url:
             raise ValueError("no url to fetch")
         _logger.info("fetching document. url: %s", url)
         doc_bytes = await self.download(url)
-        doc_str = await PdfUtils.pdf_to_text(doc_bytes)
-        doc = DocumentData(url=url, content=doc_str, key=document_key)
+        doc = FileData(content=doc_bytes, metadata=FileMetadata(
+            key=document_key,
+            type=FileType.PDF,
+        ))
         saved = await self.cache.save(doc)
-        _logger.warning("failed saving to cache. doc: %s", doc)
+        if not saved:
+            _logger.warning("failed saving to cache. doc: %s", doc)
         return doc
 
 

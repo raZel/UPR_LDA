@@ -3,8 +3,11 @@ from typing import List, NamedTuple, Iterator, Optional
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import re
+import logging
 from enum import Enum
 from UPR_LDA.models import UPRCycle
+
+_logger = logging.getLogger(__name__)
 
 class StakeholdersSummaryReference(NamedTuple):
     url: str
@@ -18,23 +21,33 @@ class CountryCyclesParser(URLParser):
 
     def find_stake_holders_summary_links(self, soup: BeautifulSoup, base_url: str) -> Iterator[StakeholdersSummaryReference]:
         upr_cycle_title_tags = soup.find_all(class_='upr-cycle-title')
+        _logger.debug(f"Found {len(upr_cycle_title_tags)} cycle title tags on page {base_url}")
         
         for cycle_title_tag in upr_cycle_title_tags:
             cycle = self.find_cycle(cycle_title_tag.text)
-            if cycle is None or cycle in (UPRCycle.FOURTH,):
+            if cycle is None:
+                _logger.debug(f"Could not determine cycle from title: '{cycle_title_tag.text}'")
+                continue
+            
+            if cycle in (UPRCycle.FOURTH,):
+                _logger.debug(f"Skipping cycle {cycle.value} as it is not currently supported.")
                 continue
             
             strong_tag = next((t for t in cycle_title_tag.parent.find_all('strong') if 'Summary of stakeholders' in t.text),None)
             if strong_tag is None:
+                _logger.debug(f"No 'Summary of stakeholders' strong tag found for cycle {cycle.value} on page {base_url}")
                 continue
             ref_tag = strong_tag.find_next_sibling('a')
             if ref_tag is None:
+                _logger.debug(f"No 'a' tag found next to 'Summary of stakeholders' for cycle {cycle.value} on page {base_url}")
                 continue
             relative_url = ref_tag.get('href')
             if relative_url is None:
+                _logger.warning(f"Found 'a' tag with no href for cycle {cycle.value} on page {base_url}")
                 continue
             
             absolute_url = urljoin(base_url, relative_url)
+            _logger.debug(f"Found stakeholders summary link for cycle {cycle.value}: {absolute_url}")
             yield StakeholdersSummaryReference(url=absolute_url, cycle=cycle)
 
 
@@ -42,6 +55,8 @@ class CountryCyclesParser(URLParser):
         new_states = []
         for ref in self.find_stake_holders_summary_links(soup_content, state.url):
             new_state = state.create_new_state(ref.url)
-            new_state.tags.cycle = ref.cycle.value
+            new_state.cycle = ref.cycle.value
+            _logger.debug(f"Created new state for country {state.country}, cycle {new_state.cycle}, url {new_state.url}")
             new_states.append(new_state)
+        _logger.info(f"Parser created {len(new_states)} new states from page {state.url}.")
         return new_states
