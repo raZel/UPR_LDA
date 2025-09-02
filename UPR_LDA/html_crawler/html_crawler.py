@@ -45,5 +45,5 @@ def crawl_upr_for_civil_society_submissions(url: str, data_store: UPRDataStore):
         results = [UPRDocumentMetaData(**state.model_dump()) for state in states]
         with data_store.autoPersist:
             for res in results:
-                data_store.add(res)
+                data_store.add_or_update(res)
         

@@ -11,20 +11,23 @@ from UPR_LDA.models import FileData, FileMetadata, FileType
 from .document_cache import DocumentCache, NOOPDocumentCache
 import hashlib
 import aiohttp
+import asyncio
 
 _logger = logging.getLogger(__name__)
 class DocumentFetcher(abc.ABC):
-    def __init__(self) -> None:
+    def __init__(self, concurrency_limit: int = 10) -> None:
        self.session = aiohttp.ClientSession()
+       self.semaphore = asyncio.Semaphore(concurrency_limit)
 
     async def download(self, url) -> bytes:
-        async with self.session.get(url) as response:
-            try:
-                response.raise_for_status()
-                return await response.read()
-            except aiohttp.ClientResponseError:
-                _logger.error(f"Request to {url} failed with status {response.status}. Response: {await response.text()}")
-                raise
+        async with self.semaphore:
+            async with self.session.get(url) as response:
+                try:
+                    response.raise_for_status()
+                    return await response.read()
+                except aiohttp.ClientResponseError:
+                    _logger.error(f"Request to {url} failed with status {response.status}. Response: {await response.text()}")
+                    raise
 
     @abc.abstractmethod
     async def fetch(self, url: str, key: typing.Optional[str] = None) -> FileData:

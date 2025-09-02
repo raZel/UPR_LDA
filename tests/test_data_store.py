@@ -25,17 +25,17 @@ class TestDataStore:
             store = JSONDataStore(model_cls=UPRDocumentMetaData, json_path=json_path)
             assert len(store.all()) == 0
             data = [self.create_upr_metadata(i) for i in range(3)]
-            store.add(data[1])
+            store.add_or_update(data[1])
             assert store.get("key1") == data[1]
             store.persist()
-            store.add(data[0])
+            store.add_or_update(data[0])
             assert store.get("key1") == data[1]
             assert store.get("key0") == data[0]
             store = JSONDataStore(model_cls=UPRDocumentMetaData,json_path=json_path)
             assert store.get("key1") == data[1]
             assert store.get("key0") is None
             with store.autoPersist:
-                store.add(data[2])
+                store.add_or_update(data[2])
             assert store.get("key0") is None            
             assert store.get("key1") == data[1]
             assert store.get("key2") == data[2]
@@ -43,6 +43,14 @@ class TestDataStore:
             assert store.get("key0") is None            
             assert store.get("key1") == data[1]
             assert store.get("key2") == data[2]
+            with store.autoPersist:
+                store.remove("key1")
+                assert store.get("key1") == None
+            store = JSONDataStore(model_cls=UPRDocumentMetaData,json_path=json_path)
+            assert store.get("key0") is None            
+            assert store.get("key1") == None
+            assert store.get("key2") == data[2]
+
             
 
 

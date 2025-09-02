@@ -113,7 +113,7 @@ class CivilSocietySubmissionsParser(URLParser):
                 org_name_tag = cols[org_name_col_idx]
                 languages_tag = cols[languages_col_idx]
 
-                org_name = org_name_tag.get_text(strip=True)
+                org_name = org_name_tag.get_text(strip=True).removeprefix('Name of organisation')
                 
                 # Find all 'a' tags within the languages column that contain 'E' (for English documents)
                 english_links_found = 0

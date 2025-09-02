@@ -25,7 +25,5 @@ class DocumentationByCountryParser(URLParser):
             new_state.country = clean_country_name(country_name)
             _logger.debug(f"Found country: {new_state.country} with url {new_state.url}")
             new_states.append(new_state)
-        if len(country_links) > 1:
-            _logger.warning("Found multiple country links, but only processing the first one due to a 'break' statement. To process all, remove the 'break'.")
         _logger.info(f"Parser created {len(new_states)} new states from page {state.url}.")
         return new_states

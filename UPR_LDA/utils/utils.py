@@ -6,6 +6,8 @@ from pydantic import BaseModel
 import typing
 from UPR_LDA.data_store import UPRDataStore
 from UPR_LDA.models.models import UPRDocumentMetaData
+from UPR_LDA.documents_fetcher.document_cache import FSDocumentCache
+from UPR_LDA.documents_fetcher.document_fetcher import PDFFetcher
 
 _logger = logging.getLogger(__name__)
 
@@ -46,6 +48,22 @@ def get_data_store() -> UPRDataStore:
 
 def get_cache_dir() -> str:
     return get_settings().upr_document_cache_dir
+
+_fs_cache = None
+def get_fs_cache() -> FSDocumentCache:
+    global _fs_cache
+    if _fs_cache is None:
+        cache_dir = get_settings().upr_document_cache_dir
+        _fs_cache = FSDocumentCache(cache_dir)
+    return _fs_cache
+    
+    
+_pdf_fetcher = None
+def get_pdf_fetcher() -> PDFFetcher:
+    global _pdf_fetcher
+    if _pdf_fetcher is None:
+        _pdf_fetcher = PDFFetcher(cache=get_fs_cache())
+    return _pdf_fetcher
 
 def clean_country_name(text: str) -> str:
     """

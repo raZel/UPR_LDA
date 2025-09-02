@@ -17,11 +17,19 @@ class StakeholdersSummaryReference(NamedTuple):
 class CountryCyclesParser(URLParser):
     @staticmethod
     def find_cycle(title: str) -> Optional[UPRCycle]:
+        if 'thrid' in title.lower():
+            title = 'Third'
         return next((uc for uc in UPRCycle if uc.lower() in title.lower()), None)
 
     def find_stake_holders_summary_links(self, soup: BeautifulSoup, base_url: str) -> Iterator[StakeholdersSummaryReference]:
         upr_cycle_title_tags = soup.find_all(class_='upr-cycle-title')
         _logger.debug(f"Found {len(upr_cycle_title_tags)} cycle title tags on page {base_url}")
+        if len(upr_cycle_title_tags) == 0:
+            _logger.debug(f"Falling back to searching h2 headers")
+            
+            upr_cycle_title_tags = [t for t in soup.find_all('h2') if 'ycle' in t.text.lower()]
+            _logger.debug(f"Found {len(upr_cycle_title_tags)} cycle title tags on page {base_url}")
+
         
         for cycle_title_tag in upr_cycle_title_tags:
             cycle = self.find_cycle(cycle_title_tag.text)
@@ -33,13 +41,22 @@ class CountryCyclesParser(URLParser):
                 _logger.debug(f"Skipping cycle {cycle.value} as it is not currently supported.")
                 continue
             
-            strong_tag = next((t for t in cycle_title_tag.parent.find_all('strong') if 'Summary of stakeholders' in t.text),None)
+            strong_tag = next((t for t in cycle_title_tag.parent.find_all('strong') if 'summary of stakeholders' in t.text.lower()),None)
+            if strong_tag is None:
+                _logger.debug(f"Not found, Searching 3 parents up for 'Summary of stakeholders' strong tag found for cycle {cycle.value} on page {base_url}")
+                strong_tag = next((t for t in cycle_title_tag.parent.parent.parent.find_all('strong') if 'summary of stakeholders' in t.text.lower()),None)
+                if strong_tag is None:
+                    _logger.debug(f"Not found, Searching 4 parents up for 'Summary of stakeholders' strong tag found for cycle {cycle.value} on page {base_url}")
+                    strong_tag = next((t for t in cycle_title_tag.parent.parent.parent.parent.find_all('strong') if 'summary of stakeholders' in t.text.lower()),None)
             if strong_tag is None:
                 _logger.debug(f"No 'Summary of stakeholders' strong tag found for cycle {cycle.value} on page {base_url}")
                 continue
+
             ref_tag = strong_tag.find_next_sibling('a')
             if ref_tag is None:
                 _logger.debug(f"No 'a' tag found next to 'Summary of stakeholders' for cycle {cycle.value} on page {base_url}")
+                ref_tag = strong_tag.find('a')
+            if ref_tag is None:
                 continue
             relative_url = ref_tag.get('href')
             if relative_url is None:

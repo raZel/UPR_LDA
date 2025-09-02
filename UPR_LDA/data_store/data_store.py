@@ -36,10 +36,13 @@ class JSONDataStore(Generic[T]):
             data = json.load(f)
             self._data = {o[_KEY_FIELD_NAME] :self.model_cls(**o) for o in data.get('data', [])}
 
-    def add(self, val: T) -> None:
+    def add_or_update(self, val: T) -> None:
         if get_document_key(val) is None:
             set_document_key(val, str(uuid4()))
         self._data[get_document_key(val)] = deepcopy(val)
+
+    def remove(self, key: ModelKey):
+        del self._data[key]
 
     def all(self) -> List[T]:
         return deepcopy(list(self._data.values()))
