@@ -24,6 +24,16 @@
       "justMyCode": true,
       "args": []
     },
+    {
+      "name": "download_pdfs",
+      "type": "debugpy",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/scripts/download_pdfs.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": []
+    },
 
     // {
     //   "name": "Index Files",

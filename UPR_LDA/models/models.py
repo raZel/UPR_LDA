@@ -15,7 +15,7 @@ class FileType(str, Enum):
 
 class FileMetadata(BaseModel):
     key: ModelKey
-    type: FileType
+    file_type: FileType
 
 class FileData(BaseModel):
     content: bytes
@@ -36,7 +36,7 @@ class UPRCivilSocietyTags(BaseModel):
 
 class UPRDocumentMetaData(DocumentMetaData, UPRCivilSocietyTags):
     continent: typing.Optional[str] = None
-    pdf_file: typing.Optional[FileData] = None
-    text_file: typing.Optional[FileData] = None
+    pdf_file: typing.Optional[FileMetadata] = None
+    text_file: typing.Optional[FileMetadata] = None
 
 

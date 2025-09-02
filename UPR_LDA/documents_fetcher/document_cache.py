@@ -45,11 +45,14 @@ class FSDocumentCache(DocumentCache):
         self.cache_dir = cache_dir
         os.makedirs(self.cache_dir, exist_ok=True)
 
+    def _get_content_dir(self, document_key: str):
+        return os.path.join(self.cache_dir, f"{document_key}-content")
+    
     def _get_content_path(self, document_key: str):
-        return os.path.join(self.cache_dir, f"{document_key}.content")
+        return os.path.join(self._get_content_dir(document_key), f"{document_key}")
 
     def _get_metadata_path(self, document_key: str):
-        return os.path.join(self.cache_dir, f"{document_key}.metadata.json")
+        return os.path.join(self._get_content_dir(document_key), f"{document_key}.metadata.json")
 
     async def save(self, document: models.FileData) -> bool:
         content_path = self._get_content_path(document.key)

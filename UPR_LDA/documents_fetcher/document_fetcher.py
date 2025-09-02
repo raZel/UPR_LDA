@@ -38,7 +38,7 @@ class PDFFetcher(DocumentFetcher):
         super().__init__()
         self.cache = cache
 
-    async def fetch(self, url: typing.Optional[str] = None, key: typing.Optional[str] = None, check_cache_only: bool = False) -> FileData:
+    async def fetch(self, url: typing.Optional[str] = None, key: typing.Optional[str] = None, check_cache_only: bool = False, skip_cache: bool = False) -> FileData:
         """
             fetch document from url.
             optionally use key as identifier for the document mainly for caching
@@ -54,8 +54,11 @@ class PDFFetcher(DocumentFetcher):
         else:
             raise ValueError("Either url or key must be provided")
         
-        _logger.debug("checking cache. document_key: %s", document_key)
-        doc = await self.cache.load(document_key)
+        doc = None
+        if not skip_cache:
+            _logger.debug("checking cache. document_key: %s", document_key)
+            doc = await self.cache.load(document_key)
+        
         if doc:
             return doc
         _logger.debug("document not in cache. document_key: %s", document_key)
@@ -68,7 +71,7 @@ class PDFFetcher(DocumentFetcher):
         doc_bytes = await self.download(url)
         doc = FileData(content=doc_bytes, metadata=FileMetadata(
             key=document_key,
-            type=FileType.PDF,
+            file_type=FileType.PDF,
         ))
         saved = await self.cache.save(doc)
         if not saved:
