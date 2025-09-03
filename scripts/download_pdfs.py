@@ -1,5 +1,5 @@
 import logging
-from UPR_LDA.utils import get_settings, init_logger, get_data_store, get_pdf_fetcher
+from UPR_LDA.utils import get_settings, init_logger, get_data_store, get_pdf_fetcher, get_fs_cache
 import asyncio
 from UPR_LDA.data_store import UPRDataStore
 from UPR_LDA.documents_fetcher.document_cache import FSDocumentCache
@@ -25,6 +25,7 @@ async def download_single_doc(doc: UPRDocumentMetaData, store: UPRDataStore, fet
         success = await cache.save(text_data)
         if not success:
             raise ValueError("failed cache save")
+        doc.text_file = text_data.metadata
         with store.autoPersist:
             store.add_or_update(doc)
         _logger.info("downloaded pdf for doc: %s", doc.key)
@@ -41,12 +42,16 @@ async def main():
     _logger.info(f"Starting to download pdfs")
     store = get_data_store()
     fetcher = get_pdf_fetcher()
-
-    docs_to_download = [doc for doc in store.all() if not doc.pdf_file and doc.url]
+    cache = get_fs_cache()
+    docs_to_download = [doc for doc in store.all() if not doc.pdf_file and doc.url][:2]
     _logger.info("Downloading %s documents", len(docs_to_download))
-    for doc in docs_to_download:
-            
-    _logger.info(f"Finished downloading pdfs")
+    tasks = [download_single_doc(doc, store, fetcher, cache) for doc in docs_to_download]
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    num_fail = len([res for res in results if isinstance(res, Exception)])
+    _logger.info(f"Finished downloading pdfs. out of %s, succes: %s, fail: %s", 
+                 len(docs_to_download), 
+                 len(docs_to_download) - num_fail,
+                 num_fail)
 
 
 if __name__ == "__main__":

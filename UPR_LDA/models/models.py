@@ -35,8 +35,9 @@ class UPRCivilSocietyTags(BaseModel):
     organization_name: typing.Optional[str] = None
 
 class UPRDocumentMetaData(DocumentMetaData, UPRCivilSocietyTags):
-    continent: typing.Optional[str] = None
     pdf_file: typing.Optional[FileMetadata] = None
     text_file: typing.Optional[FileMetadata] = None
+    region: typing.Optional[str] = None
+    is_oecd: typing.Optional[bool] = None
 
 

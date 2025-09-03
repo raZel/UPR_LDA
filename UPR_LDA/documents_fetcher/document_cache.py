@@ -46,7 +46,9 @@ class FSDocumentCache(DocumentCache):
         os.makedirs(self.cache_dir, exist_ok=True)
 
     def _get_content_dir(self, document_key: str):
-        return os.path.join(self.cache_dir, f"{document_key}-content")
+        dir = os.path.join(self.cache_dir, f"{document_key}-content")
+        os.makedirs(dir, exist_ok=True)
+        return dir
     
     def _get_content_path(self, document_key: str):
         return os.path.join(self._get_content_dir(document_key), f"{document_key}")
