@@ -1,1 +1,1 @@
-from .models import Document, DocumentKey
+from .models import *

@@ -3,8 +3,9 @@ from pdf2image import convert_from_bytes
 from PIL import Image
 import asyncio
 
-class DocumentTransformer:
-    async def pdf_to_text(self, pdf_bytes) -> str:
+class PdfUtils:
+    @staticmethod
+    async def pdf_to_text(pdf_bytes: bytes) -> str:
         # Convert PDF bytes to images
         images = await asyncio.to_thread(convert_from_bytes, pdf_bytes)
         text = ''

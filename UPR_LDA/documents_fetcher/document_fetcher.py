@@ -7,34 +7,77 @@ a pdf version of it from a url and transforming it to a txt file.
 import typing
 import abc
 import logging
-from UPR_LDA.models import Document
-from .document_downloader import DocumentDownloader
-from .document_transformer import DocumentTransformer
-from .document_cache import DocumentCache
+from UPR_LDA.models import FileData, FileMetadata, FileType
+from .document_cache import DocumentCache, NOOPDocumentCache
+import hashlib
+import aiohttp
+import asyncio
 
-logger = logging.getLogger(__name__)
-
+_logger = logging.getLogger(__name__)
 class DocumentFetcher(abc.ABC):
-    def __init__(self):
-        self.downloader = DocumentDownloader()
-        self.transformer = DocumentTransformer()
+    def __init__(self, concurrency_limit: int = 10) -> None:
+       self.session = aiohttp.ClientSession()
+       self.semaphore = asyncio.Semaphore(concurrency_limit)
 
-    async def fetch(self, url: str) -> Document:
-        # logger.info("fetching document. document_key: %s, url: %s", document_key, url)
-        # # check if in cache
-        # if self.cache:
-        #     try:
-        #         logger.info("fetching from cache. document_key: %s, url: %s", document_key, url)
-        #         return await self.cache.load(document_key)
-        #     except Exception:
-        #         logger.exception("failed fetching from cache. document_key: %s, url: %s", document_key, url)
+    async def download(self, url) -> bytes:
+        async with self.semaphore:
+            async with self.session.get(url) as response:
+                try:
+                    response.raise_for_status()
+                    return await response.read()
+                except aiohttp.ClientResponseError:
+                    _logger.error(f"Request to {url} failed with status {response.status}. Response: {await response.text()}")
+                    raise
+
+    @abc.abstractmethod
+    async def fetch(self, url: str, key: typing.Optional[str] = None) -> FileData:
+        pass
+
+class PDFFetcher(DocumentFetcher):
+    def __init__(self, cache: DocumentCache = NOOPDocumentCache()):
+        super().__init__()
+        self.cache = cache
+
+    async def fetch(self, url: typing.Optional[str] = None, key: typing.Optional[str] = None, check_cache_only: bool = False, skip_cache: bool = False) -> FileData:
+        """
+            fetch document from url.
+            optionally use key as identifier for the document mainly for caching
+            if no key provided hash the url to get a key
+            important, duplicates are only checked with the key, not the content.
+            fetching the same url with different keys will save duplicates.
+        """
+        _logger.debug("fetch called with args: %s", locals())
+        if key:
+            document_key = key
+        elif url:
+            document_key = hashlib.md5(url.encode()).hexdigest() + ".pdf"
+        else:
+            raise ValueError("Either url or key must be provided")
         
-        logger.info("fetching document. url: %s", url)
-        doc_bytes = await self.downloader.download(url)
-        doc_str = await self.transformer.pdf_to_text(doc_bytes)
-        return Document(url=url, content=doc_str)
+        doc = None
+        if not skip_cache:
+            _logger.debug("checking cache. document_key: %s", document_key)
+            doc = await self.cache.load(document_key)
+        
+        if doc:
+            return doc
+        _logger.debug("document not in cache. document_key: %s", document_key)
+        if check_cache_only:
+            raise ValueError("not in cache and check_cache_only: %s", check_cache_only)
+
+        if not url:
+            raise ValueError("no url to fetch")
+        _logger.info("fetching document. url: %s", url)
+        doc_bytes = await self.download(url)
+        doc = FileData(content=doc_bytes, metadata=FileMetadata(
+            key=document_key,
+            file_type=FileType.PDF,
+        ))
+        saved = await self.cache.save(doc)
+        if not saved:
+            _logger.warning("failed saving to cache. doc: %s", doc)
+        return doc
 
 
 
     
-

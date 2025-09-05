@@ -19,7 +19,7 @@ The general process is as follows:
 ## Install
 
 This project uses conda to manage dependencies required by the code.
-Find Installation instructions [here](https://www.anaconda.com/docs/getting-started/miniconda/install)
+[Installation instructions](https://www.anaconda.com/docs/getting-started/miniconda/install)
 
 With conda properly installed cd to the upr_lda directory and run create the conda environment to run the upr_lda code.
 `conda env create`
@@ -30,4 +30,6 @@ With conda properly installed cd to the upr_lda directory and run create the con
 - `conda init zsh`
 - `conda create -n upr_lda python=3.12`
 - `conda activate upr_lda`
-- `conda env export > environment.yml` (run everytime conda or pip packages are updated in an activated env)
+- `pip install package` in activated env to install python packages
+- `conda env export --no-build | grep -v "^prefix: " > environment.yml` (run everytime conda or pip packages are updated in an activated env)
+- run tests with `pytest -vvv` from project root
