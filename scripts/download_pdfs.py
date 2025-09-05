@@ -17,7 +17,20 @@ async def download_single_doc(doc: UPRDocumentMetaData, store: UPRDataStore, fet
         pdf_file_key = f"{doc.key}.pdf"
         file_data = await fetcher.fetch(url=doc.url, key=pdf_file_key)
         doc.pdf_file = file_data.metadata
-        text_content = await PdfUtils.pdf_to_text(file_data.content)
+        with store.autoPersist:
+            store.add_or_update(doc)
+        _logger.info("downloaded pdf for doc: %s", doc.key)
+            
+    except Exception as e:
+        _logger.error("failed to fetch pdf for doc: %s, url: %s, error: %s", doc.key, doc.url, e)
+        raise
+async def textualize_single_doc(doc: UPRDocumentMetaData, store: UPRDataStore, fetcher: PDFFetcher, cache: FSDocumentCache):
+    _logger.info("fetching pdf for doc: %s", doc.key)
+    try:    
+        pdf = await cache.load(doc.key)
+        if pdf is None:
+            raise ValueError("missing pdf")
+        text_content = await PdfUtils.pdf_to_text(pdf.content)
         if len(text_content) == 0:
             raise ValueError("empty pdf_to_text")
         text_file_key = f"{doc.key}.txt"
@@ -26,12 +39,10 @@ async def download_single_doc(doc: UPRDocumentMetaData, store: UPRDataStore, fet
         if not success:
             raise ValueError("failed cache save")
         doc.text_file = text_data.metadata
-        with store.autoPersist:
-            store.add_or_update(doc)
-        _logger.info("downloaded pdf for doc: %s", doc.key)
     except Exception as e:
-        _logger.error("failed to fetch pdf for doc: %s, url: %s, error: %s", doc.key, doc.url, e)
+        _logger.error("failed to textualize pdf for doc: %s, url: %s, error: %s", doc.key, doc.url, e)
         raise
+
 
 async def main():
     """
@@ -43,7 +54,7 @@ async def main():
     store = get_data_store()
     fetcher = get_pdf_fetcher()
     cache = get_fs_cache()
-    docs_to_download = [doc for doc in store.all() if not doc.pdf_file and doc.url][:2]
+    docs_to_download = [doc for doc in store.all() if not doc.pdf_file and doc.url]
     _logger.info("Downloading %s documents", len(docs_to_download))
     tasks = [download_single_doc(doc, store, fetcher, cache) for doc in docs_to_download]
     results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -52,6 +63,17 @@ async def main():
                  len(docs_to_download), 
                  len(docs_to_download) - num_fail,
                  num_fail)
+    
+    # docs_to_textualize = [doc for doc in store.all() if doc.pdf_file and not doc.text_file]
+    # _logger.info("Textualizing %s documents", len(docs_to_textualize))
+    # tasks = [textualize_single_doc(doc, store, fetcher, cache) for doc in docs_to_textualize]
+    # results = await asyncio.gather(*tasks, return_exceptions=True)
+    # num_fail = len([res for res in results if isinstance(res, Exception)])
+    # _logger.info(f"Finished textualizing pdfs. out of %s, succes: %s, fail: %s", 
+    #              len(docs_to_textualize), 
+    #              len(docs_to_textualize) - num_fail,
+    #              num_fail)
+
 
 
 if __name__ == "__main__":

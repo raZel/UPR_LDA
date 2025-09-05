@@ -39,5 +39,7 @@ class UPRDocumentMetaData(DocumentMetaData, UPRCivilSocietyTags):
     text_file: typing.Optional[FileMetadata] = None
     region: typing.Optional[str] = None
     is_oecd: typing.Optional[bool] = None
+    income_level: typing.Optional[str] = None
+    democracy_level: typing.Optional[str] = None
 
 

@@ -76,6 +76,10 @@ class FSDocumentCache(DocumentCache):
     async def load(self, document_key: str) -> typing.Optional[models.FileData]:
         content_path = self._get_content_path(document_key)
         metadata_path = self._get_metadata_path(document_key)
+        if not os.path.exists(content_path) and not os.path.exists(metadata_path):
+            _logger.debug("Document with key %s not found in cache.", document_key)
+            return None
+
         try:
             # Load metadata
             async with aiofiles.open(metadata_path, 'r', encoding='utf-8') as f:
